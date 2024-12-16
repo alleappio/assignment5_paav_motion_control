@@ -11,6 +11,9 @@ class PurePursuitController:
         """
         self.wheelbase = wheelbase
         self.max_steer = max_steer
+        self.Ld0 = 1 # Base lookahead
+        self.kv = 0.0 # Speed based gain
+        self.kc = 0.5 # Curve based gain
 
     def compute_steering_angle(self, target, actual_heading, Lf):
         """
@@ -25,9 +28,9 @@ class PurePursuitController:
         """
         # Calculate the heading error (alpha)
         alpha = math.atan2(target[1], target[0]) - actual_heading
-        
+
         # Compute the steering angle (delta)
-        delta = 0.0#TO-DO: complete as in the PurePursuit slides
+        delta = math.atan((2*self.wheelbase*math.sin(alpha))/Lf)#TO-DO: complete as in the PurePursuit slides
         
         # Saturate the steering angle within the maximum limits
         delta = max(-self.max_steer, min(delta, self.max_steer))
