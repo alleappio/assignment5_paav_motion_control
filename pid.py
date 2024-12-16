@@ -47,7 +47,6 @@ class PIDController:
         # Integral term
         self.integral += error * dt
         integral = self.ki * self.integral
-        
         # Anti-windup: Adjust the integral term if it would lead to saturation
         # TO-DO: Complete, 
         lower_limit, upper_limit = self.output_limits
@@ -60,6 +59,15 @@ class PIDController:
         #     anti_windup_correction = (raw_output - upper_limit) / self.ki
         #     self.integral -= 0#TO-DO: Complete as in PID - Antiwindup slide
         #     integral = self.ki * self.integral
+        output = proportional + integral
+        if lower_limit is not None and output < lower_limit:
+            self.anti_windup_gain = (output - lower_limit)/self.ki
+            self.integral = self.integral #TO-DO: Complete as in PID - Antiwindup slide
+            integral = self.ki * self.integral
+        if upper_limit is not None and output > lower_limit:
+            self.anti_windup_gain = (output - upper_limit)/self.ki
+            self.integral = self.integral #TO-DO: Complete as in PID - Antiwindup slide
+            integral = self.ki * self.integral
 
         # Derivative term
         derivative = self.kd * (error - self.previous_error) / dt
