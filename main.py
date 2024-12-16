@@ -8,33 +8,16 @@ import purepursuit
 # from mpc import *
 import cubic_spline_planner
 import math
-
-# Simulation parameters
-dt = 0.001         # Time step (s)
-ax = 0.0            # Constant longitudinal acceleration (m/s^2)
-steer = 0.0      # Constant steering angle (rad)
-sim_time = 60.0      # Simulation duration in seconds
-steps = int(sim_time / dt)  # Simulation steps (30 seconds)
-
-# Control references
-target_speed = 15.0
-
-# Vehicle parameters
-lf = 1.156          # Distance from COG to front axle (m)
-lr = 1.42           # Distance from COG to rear axle (m)
-wheelbase = lf + lr
-mass = 1200         # Vehicle mass (kg)
-Iz = 1792           # Yaw moment of inertia (kg*m^2)
-max_steer = 3.14  # Maximum steering angle in radians
+from parameters import SimulationParameters as sim_params
+from parameters import VehicleParameters as vehicle_params
+from parameters import PIDParameters as PID_params
+from parameters import PurepursuitParameters as PP_params
 
 # Create instance of PID for Longitudinal Control
-long_control_pid = pid.PIDController(kp=0.001, ki=0.001, kd=0.001, output_limits=(-2, 2))
+long_control_pid = pid.PIDController(kp=PID_params.kp, ki=PID_params.ki, kd=PID_params.kd, output_limits=PID_params.output_limits)
 
 # Create instance of PurePursuit, Stanley and MPC for Lateral Control
-k_pp = 0.001  # Speed proportional gain for Pure Pursuit
-look_ahead = 1.0  # Minimum look-ahead distance for Pure Pursuit
-k_stanley = 0.001  # Gain for cross-track error for Stanley
-pp_controller = purepursuit.PurePursuitController(wheelbase, max_steer)
+pp_controller = purepursuit.PurePursuitController(vehicle_params.wheelbase, vehicle_params.max_steer)
 # stanley_controller = stanley.StanleyController(k_stanley, lf, max_steer)
 
 def load_path(file_path):
@@ -97,7 +80,7 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
     """ Run a simulation with the given parameters and return all states. """
 
     # Initialize the simulation
-    sim = Simulation(lf, lr, mass, Iz, dt, integrator=integrator, model=model)
+    sim = Simulation(vehicle_params.lf, vehicle_params.lr, vehicle_params.mass, vehicle_params.Iz, dt, integrator=integrator, model=model)
 
     # Storage for state variables and slip angles
     x_vals, y_vals, theta_vals, vx_vals, vy_vals, r_vals = [], [], [], [], [], []
@@ -111,7 +94,7 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         print("Time:", step*dt)
 
         # Calculate ax to track speed
-        ax = long_control_pid.compute(target_speed, sim.vx, dt) # Exercise 1
+        ax = long_control_pid.compute(sim_params.target_speed, sim.vx, dt) # Exercise 1
         steer = 0
 
         # Update actual frenet-frame position in the spline
@@ -131,14 +114,14 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
             break
 
         # get target pose
-        Lf = k_pp * sim.vx + look_ahead #Bonus: include here the curvature dependency
+        Lf = PP_params.k_pp * sim.vx + PP_params.look_ahead #Bonus: include here the curvature dependency
         s_pos = path_spline.cur_s + Lf
 
         trg = path_spline.calc_position(s_pos)
         trg = [ trg[0], trg[1] ]
         pp_position = actual_position
         # Adjust CoG position to the rear axle position for PP
-        pp_position = actual_position[0] + lr * math.cos(sim.theta), actual_position[1] + lr * math.sin(sim.theta)
+        pp_position = actual_position[0] + vehicle_params.lr * math.cos(sim.theta), actual_position[1] + vehicle_params.lr * math.sin(sim.theta)
         loc_trg = point_transform(trg, pp_position, sim.theta)
 
         # Calculate steer to track path
@@ -198,7 +181,7 @@ def main():
     actual_state = []
     labels = []
     for integrator, model in configs:
-        actual_state = run_simulation(ax, steer, dt, integrator, model, steps)
+        actual_state = run_simulation(sim_params.ax, sim_params.steer, sim_params.dt, integrator, model, sim_params.steps)
         all_results.append(actual_state)
         labels.append(f"{integrator.capitalize()} - {model.capitalize()}")
 
