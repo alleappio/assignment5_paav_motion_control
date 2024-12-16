@@ -87,11 +87,13 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
     alpha_f_vals, alpha_r_vals = [], []  # Slip angles
 
     # casadi_model() #for MPC... TO-DO
-
+    prev_time=0
     for step in range(steps):
-    
+        time = step*dt
         # Print time
-        print("Time:", step*dt)
+        if(int(time)!=int(prev_time)):
+            print(f"time: {int(time)} seconds")
+            prev_time = time
 
         # Calculate ax to track speed
         ax = long_control_pid.compute(sim_params.target_speed, sim.vx, dt) # Exercise 1
