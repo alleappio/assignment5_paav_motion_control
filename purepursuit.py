@@ -27,7 +27,7 @@ class PurePursuitController:
         alpha = math.atan2(target[1], target[0]) - actual_heading
 
         # Compute the steering angle (delta)
-        delta = math.atan((2*self.wheelbase*math.sin(alpha))/Lf)#TO-DO: complete as in the PurePursuit slides
+        delta = math.atan2(2*self.wheelbase*math.sin(alpha),Lf)
         
         # Saturate the steering angle within the maximum limits
         delta = max(-self.max_steer, min(delta, self.max_steer))

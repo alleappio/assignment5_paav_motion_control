@@ -19,7 +19,7 @@ long_control_pid = pid.PIDController(kp=PID_params.kp, ki=PID_params.ki, kd=PID_
 
 # Create instance of PurePursuit, Stanley and MPC for Lateral Control
 pp_controller = purepursuit.PurePursuitController(vehicle_params.wheelbase, vehicle_params.max_steer)
-stanley_controller = stanley.StanleyController(stanley_params.k_stanley, vehicle_params.lf, max_steer)
+stanley_controller = stanley.StanleyController(stanley_params.k_stanley, vehicle_params.lf, max_steer, stanley_params.k_he, stanley_params.k_ctc)
 
 def load_path(file_path):
     file = open(file_path, "r")
@@ -156,12 +156,12 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
 
         # Calculate steer to track path
         
-        ####### Pure Pursuit # Comment for Exercise 1
+        ####### Pure Pursuit 1
         # Compute the look-ahead distance
         if(sim_params.controller == 'purepursuit'):
             steer = pp_controller.compute_steering_angle(loc_trg, sim.theta, Lf)
         
-        ###### Stanley # Comment for Exercise 1
+        ###### Stanley 
         #TO-DO: Move actual position (CoG) to the front axle for stanley
         if(sim_params.controller == 'stanley'):
             stanley_target = position_projected[0], position_projected[1], path_spline.calc_yaw(path_spline.cur_s)

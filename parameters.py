@@ -26,10 +26,12 @@ class PIDParameters:
 
 class PurepursuitParameters:
     k_v = 1                     # Speed proportional gain for Pure Pursuit
-    k_c = 0.1                     # Curve proportional gain for Pure Pursuit
-    limit_theta = 0.1
+    k_c = 0.1                   # Curve proportional gain for Pure Pursuit
+    limit_theta = 0.1           # Minimum heading angle for adding curve proportional gain
     look_ahead = 1.0            # Minimum look-ahead distance for Pure Pursuit
 
 
 class StanleyParameters:
-    k_stanley = 0.001           # Gain for cross-track error for Stanley
+    k_stanley = 0.1           # Gain for cross-track error for Stanley
+    k_he = 0.1                # Gain for heading error
+    k_ctc = 0.1               # Gain for cross-trac correction 
