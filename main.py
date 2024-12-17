@@ -115,8 +115,14 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
             print("Lateral error: ", local_error[1])
             break
 
-        # get target pose
-        Lf = PP_params.k_pp * sim.vx + PP_params.look_ahead #Bonus: include here the curvature dependency
+        # Calculate lookahead including:
+        # - base lookahead
+        # - speed
+        # - curvature
+        Lf = PP_params.k_v * sim.vx + PP_params.look_ahead 
+        if(abs(sim.theta) > PP_params.limit_theta):
+            Lf += PP_params.k_c / abs(sim.theta)
+
         s_pos = path_spline.cur_s + Lf
 
         trg = path_spline.calc_position(s_pos)

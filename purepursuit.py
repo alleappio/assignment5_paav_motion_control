@@ -11,9 +11,6 @@ class PurePursuitController:
         """
         self.wheelbase = wheelbase
         self.max_steer = max_steer
-        self.Ld0 = 1 # Base lookahead
-        self.kv = 0.0 # Speed based gain
-        self.kc = 0.5 # Curve based gain
 
     def compute_steering_angle(self, target, actual_heading, Lf):
         """
