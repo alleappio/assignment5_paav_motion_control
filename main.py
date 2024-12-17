@@ -25,15 +25,26 @@ def load_path(file_path):
     
     xs = []
     ys = []
+    
+    cur_point = [0.0,0.0]
+    prev_point = [0.0,0.0]
+
+    total_path = 0.0
 
     while(file.readline()):
         line = file.readline()
-        xs.append( float(line.split(",")[0]) )
-        ys.append( float(line.split(",")[1]) )
-    return xs, ys
+        cur_point[0] = float(line.split(",")[0])
+        cur_point[1] = float(line.split(",")[1])
+        total_path += math.dist(cur_point, prev_point)
+        xs.append( cur_point[0] )
+        ys.append( cur_point[1] )
+        prev_point[0] = cur_point[0]
+        prev_point[1] = cur_point[1]
+    print(total_path)
+    return xs, ys, total_path
 
 # Load path and create a spline
-xs, ys = load_path("oval_trj.txt")
+xs, ys, total_path = load_path("oval_trj.txt")
 path_spline = cubic_spline_planner.Spline2D(xs, ys)
 
 def point_transform(trg, pose, yaw):
@@ -78,7 +89,10 @@ def plot_trajectory(x_vals, y_vals, labels, path_spline):
 
 def run_simulation(ax, steer, dt, integrator, model, steps=500):
     """ Run a simulation with the given parameters and return all states. """
-
+    total_path_done = 0.0
+    cur_position = (0.0, 0.0)
+    prev_position = (0.0, 0.0)
+    lap_counter = 0
     # Initialize the simulation
     sim = Simulation(vehicle_params.lf, vehicle_params.lr, vehicle_params.mass, vehicle_params.Iz, dt, integrator=integrator, model=model)
 
@@ -95,6 +109,13 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
             print(f"time: {int(time)} seconds")
             prev_time = time
 
+        cur_position = (sim.x, sim.y)
+        total_path_done += math.dist(cur_position, prev_position)
+    
+        if(abs(total_path_done - total_path) < 0.01):
+            total_path_done = 0
+            lap_counter+=1
+            print(f"done {lap_counter} lap at time {time}")
         # Calculate ax to track speed
         ax = long_control_pid.compute(sim_params.target_speed, sim.vx, dt) # Exercise 1
         steer = 0
@@ -157,6 +178,7 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
 
         # steer = opt_step(targets, sim)
 
+        prev_position = cur_position
         # Make one step simulation via model integration
         sim.integrate(ax, float(steer))
         
@@ -174,7 +196,7 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
 
         alpha_f_vals.append(alpha_f)
         alpha_r_vals.append(alpha_r)
-
+        
     return x_vals, y_vals, theta_vals, vx_vals, vy_vals, r_vals, alpha_f_vals, alpha_r_vals
 
 def main():

@@ -2,7 +2,7 @@ class SimulationParameters:
     dt = 0.001                  # Time step (s)
     ax = 0.0                    # Constant longitudinal acceleration (m/s^2)
     steer = 0.0                 # Constant steering angle (rad)
-    sim_time = 60.0             # Simulation duration in seconds
+    sim_time = 200.0             # Simulation duration in seconds
     steps = int(sim_time / dt)  # Simulation steps (30 seconds)
     target_speed = 20.0
 
