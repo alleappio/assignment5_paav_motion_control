@@ -164,6 +164,8 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         ###### Stanley 
         #TO-DO: Move actual position (CoG) to the front axle for stanley
         if(sim_params.controller == 'stanley'):
+            stanley_position = actual_position[0] + vehicle_params.lf * math.cos(sim.theta), actual_position[1] + vehicle_params.lf * math.sin(sim.theta)
+            actual_pose = stanley_position[0], stanley_position[1], sim.theta
             stanley_target = position_projected[0], position_projected[1], path_spline.calc_yaw(path_spline.cur_s)
             steer = stanley_controller.compute_steering_angle(actual_pose, stanley_target, sim.vx)
 

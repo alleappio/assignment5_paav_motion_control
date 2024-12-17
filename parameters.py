@@ -32,6 +32,6 @@ class PurepursuitParameters:
 
 
 class StanleyParameters:
-    k_stanley = 0.1           # Gain for cross-track error for Stanley
-    k_he = 0.1                # Gain for heading error
-    k_ctc = 0.1               # Gain for cross-trac correction 
+    k_stanley = 0.8           # Gain for cross-track error for Stanley
+    k_he = 0.8                # Gain for heading error
+    k_ctc = 1.5               # Gain for cross-trac correction 
