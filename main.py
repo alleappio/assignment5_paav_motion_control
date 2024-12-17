@@ -100,7 +100,8 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
     # Storage for state variables and slip angles
     x_vals, y_vals, theta_vals, vx_vals, vy_vals, r_vals = [], [], [], [], [], []
     alpha_f_vals, alpha_r_vals = [], []  # Slip angles
-
+    lat_error_vals, vel_error_vals = [], []
+    
     # casadi_model() #for MPC... TO-DO
     prev_time=0
     for step in range(steps):
@@ -142,8 +143,8 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         # - speed
         # - curvature
         Lf = PP_params.k_v * sim.vx + PP_params.look_ahead 
-        if(abs(sim.theta) > PP_params.limit_theta):
-            Lf += PP_params.k_c / abs(sim.theta)
+        if(abs(path_spline.calc_curvature(path_spline.cur_s)) > PP_params.limit_curvature):
+            Lf += PP_params.k_c / abs(path_spline.calc_curvature(path_spline.cur_s))
 
         s_pos = path_spline.cur_s + Lf
 
@@ -198,11 +199,18 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         # Calculate slip angles for front and rear tires
         alpha_f = steer - np.arctan((sim.vy + sim.l_f * sim.r) / max(0.5, sim.vx))  # Front tire slip angle
         alpha_r = -(np.arctan(sim.vy - sim.l_r * sim.r) / max(0.5, sim.vx))         # Rear tire slip angle
-
+        
         alpha_f_vals.append(alpha_f)
         alpha_r_vals.append(alpha_r)
-        
-    return x_vals, y_vals, theta_vals, vx_vals, vy_vals, r_vals, alpha_f_vals, alpha_r_vals
+
+        vel_error = (abs(sim.vx-sim_params.target_speed)/sim_params.target_speed)*100
+        prj = [ position_projected[0], position_projected[1] ]
+        local_error = point_transform(prj, actual_position, sim.theta)
+        lat_error = math.sin(abs(local_error[1]))
+
+        vel_error_vals.append(vel_error)
+        lat_error_vals.append(lat_error)
+    return x_vals, y_vals, theta_vals, vx_vals, vy_vals, r_vals, alpha_f_vals, alpha_r_vals, vel_error_vals, lat_error_vals
 
 def main():
 
@@ -229,6 +237,8 @@ def main():
     r_results = [result[5] for result in all_results]
     alpha_f_results = [result[6] for result in all_results]
     alpha_r_results = [result[7] for result in all_results]
+    vel_error_results = [result[8] for result in all_results]
+    lat_error_results = [result[9] for result in all_results]
 
     # Plot comparisons for each state variable
     plot_trajectory(x_results, y_results, labels, path_spline)
@@ -238,6 +248,8 @@ def main():
     plot_comparison(r_results, labels, "Yaw Rate Comparison", "Time Step", "Yaw Rate (rad/s)")
     plot_comparison(alpha_f_results, labels, "Front Slip Angle Comparison", "Time Step", "Slip Angle (rad) - Front")
     plot_comparison(alpha_r_results, labels, "Rear Slip Angle Comparison", "Time Step", "Slip Angle (rad) - Rear")
+    plot_comparison(vel_error_results, labels, "velocity error comparison", "Time Step", "Velocity Error (%)")
+    plot_comparison(lat_error_results, labels, "lateral error comparison", "Time Step", "Lateral Error (m)")
 
 if __name__ == "__main__":
     main()
