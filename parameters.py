@@ -5,6 +5,7 @@ class SimulationParameters:
     sim_time = 200.0             # Simulation duration in seconds
     steps = int(sim_time / dt)  # Simulation steps (30 seconds)
     target_speed = 20.0
+    controller = 'stanley'
 
 
 class VehicleParameters:
@@ -28,4 +29,7 @@ class PurepursuitParameters:
     k_c = 0.1                     # Curve proportional gain for Pure Pursuit
     limit_theta = 0.1
     look_ahead = 1.0            # Minimum look-ahead distance for Pure Pursuit
+
+
+class StanleyParameters:
     k_stanley = 0.001           # Gain for cross-track error for Stanley

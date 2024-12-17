@@ -4,21 +4,22 @@ from matplotlib.animation import FuncAnimation
 from simulation import Simulation
 import pid
 import purepursuit
-# import stanley
-# from mpc import *
+import stanley
+from mpc import *
 import cubic_spline_planner
 import math
 from parameters import SimulationParameters as sim_params
 from parameters import VehicleParameters as vehicle_params
 from parameters import PIDParameters as PID_params
 from parameters import PurepursuitParameters as PP_params
+from parameters import StanleyParameters as stanley_params
 
 # Create instance of PID for Longitudinal Control
 long_control_pid = pid.PIDController(kp=PID_params.kp, ki=PID_params.ki, kd=PID_params.kd, output_limits=PID_params.output_limits)
 
 # Create instance of PurePursuit, Stanley and MPC for Lateral Control
 pp_controller = purepursuit.PurePursuitController(vehicle_params.wheelbase, vehicle_params.max_steer)
-# stanley_controller = stanley.StanleyController(k_stanley, lf, max_steer)
+stanley_controller = stanley.StanleyController(stanley_params.k_stanley, vehicle_params.lf, max_steer)
 
 def load_path(file_path):
     file = open(file_path, "r")
@@ -157,12 +158,14 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         
         ####### Pure Pursuit # Comment for Exercise 1
         # Compute the look-ahead distance
-        steer = pp_controller.compute_steering_angle(loc_trg, sim.theta, Lf)
+        if(sim_params.controller == 'purepursuit'):
+            steer = pp_controller.compute_steering_angle(loc_trg, sim.theta, Lf)
         
         ###### Stanley # Comment for Exercise 1
         #TO-DO: Move actual position (CoG) to the front axle for stanley
-        # stanley_target = position_projected[0], position_projected[1], path_spline.calc_yaw(path_spline.cur_s)
-        # steer = stanley_controller.compute_steering_angle(actual_pose, stanley_target, sim.vx)
+        if(sim_params.controller == 'stanley'):
+            stanley_target = position_projected[0], position_projected[1], path_spline.calc_yaw(path_spline.cur_s)
+            steer = stanley_controller.compute_steering_angle(actual_pose, stanley_target, sim.vx)
 
         ###### MPC
 
