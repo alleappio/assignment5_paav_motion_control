@@ -2,7 +2,7 @@ class SimulationParameters:
     dt = 0.001                  # Time step (s)
     ax = 0.0                    # Constant longitudinal acceleration (m/s^2)
     steer = 0.0                 # Constant steering angle (rad)
-    sim_time =89.0             # Simulation duration in seconds
+    sim_time = 60.0             # Simulation duration in seconds
     steps = int(sim_time / dt)  # Simulation steps (30 seconds)
     target_speed = 25.0
     controller = 'stanley'
@@ -25,13 +25,13 @@ class PIDParameters:
 
 
 class PurepursuitParameters:
-    k_v = 1                     # Speed proportional gain for Pure Pursuit
-    k_c = 0.1                   # Curve proportional gain for Pure Pursuit
-    limit_curvature = 0.1           # Minimum heading angle for adding curve proportional gain
+    k_v = 1.5                     # Speed proportional gain for Pure Pursuit
+    k_c = 1                   # Curve proportional gain for Pure Pursuit
+    limit_curvature = 0.05           # Minimum heading angle for adding curve proportional gain
     look_ahead = 1.0            # Minimum look-ahead distance for Pure Pursuit
 
 
 class StanleyParameters:
-    k_stanley = 0.8           # Gain for cross-track error for Stanley
-    k_he = 0.8                # Gain for heading error
+    k_stanley = 1.5           # Gain for cross-track error for Stanley
+    k_he = 1.5                # Gain for heading error
     k_ctc = 1.5               # Gain for cross-trac correction 

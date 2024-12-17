@@ -49,14 +49,13 @@ class PIDController:
         integral = self.ki * self.integral
         # Anti-windup: Adjust the integral term if it would lead to saturation
         lower_limit, upper_limit = self.output_limits
-        output = proportional + integral
-        if lower_limit is not None and output < lower_limit:
-            anti_windup_correction = (output - lower_limit)/self.ki
-            #self.integral -= self.anti_windup_gain
+        raw_output = proportional + integral
+        if lower_limit is not None and raw_output < lower_limit:
+            anti_windup_correction = (raw_output - lower_limit)/self.ki
             self.integral -= self.anti_windup_gain*anti_windup_correction
             integral = self.ki * self.integral
-        if upper_limit is not None and output > upper_limit:
-            anti_windup_correction = (output - lower_limit)/self.ki
+        elif upper_limit is not None and raw_output > upper_limit:
+            anti_windup_correction = (raw_output - upper_limit)/self.ki
             self.integral -= self.anti_windup_gain*anti_windup_correction
             integral = self.ki * self.integral
 
