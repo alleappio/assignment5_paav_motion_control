@@ -2,10 +2,10 @@ class SimulationParameters:
     dt = 0.001                  # Time step (s)
     ax = 0.0                    # Constant longitudinal acceleration (m/s^2)
     steer = 0.0                 # Constant steering angle (rad)
-    sim_time = 60.0             # Simulation duration in seconds
+    sim_time = 89.0             # Simulation duration in seconds
     steps = int(sim_time / dt)  # Simulation steps (30 seconds)
-    target_speed = 20.0
-    controller = 'mpc'
+    target_speed = 28.0
+    controller = 'stanley'
 
 
 class VehicleParameters:
@@ -19,23 +19,23 @@ class VehicleParameters:
 
 
 class PIDParameters:
-    kp = 2                      # Proportional gain
-    ki = 1.2                    # Integrative gain
-    kd = 0.2                    # Derivative gain
+    kp = 1.7                      # Proportional gain
+    ki = 0.7                    # Integrative gain
+    kd = 0.1                    # Derivative gain
     output_limits = (-2, 2)     # Saturation limits
 
 
 class PurepursuitParameters:
-    k_v = 1.5                     # Speed proportional gain for Pure Pursuit
-    k_c = 1                   # Curve proportional gain for Pure Pursuit
-    limit_curvature = 0.05           # Minimum heading angle for adding curve proportional gain
+    k_v = 0.15                     # Speed proportional gain for Pure Pursuit
+    k_c = 0.08                   # Curve proportional gain for Pure Pursuit
+    limit_curvature = 0.01           # Minimum heading angle for adding curve proportional gain
     look_ahead = 1.0            # Minimum look-ahead distance for Pure Pursuit
 
 
 class StanleyParameters:
-    k_stanley = 1.5           # Gain for cross-track error for Stanley
-    k_he = 1.5                # Gain for heading error
-    k_ctc = 1.5               # Gain for cross-trac correction 
+    k_stanley = 2.9           # Gain for cross-track error for Stanley
+    k_he = 1.1                # Gain for heading error
+    k_ctc = 2.9               # Gain for cross-trac correction 
 
 
 class MpcParameters:
