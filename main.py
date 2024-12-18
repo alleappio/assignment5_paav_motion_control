@@ -117,8 +117,8 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         cur_position = (sim.x, sim.y)
         total_path_done += math.dist(cur_position, prev_position)
     
-        if(abs(total_path_done - total_path) < 0.01):
-            total_path_done = 0
+        if(total_path_done > total_path):
+            total_path_done = abs(total_path_done - total_path)
             lap_counter+=1
             print(f"done {lap_counter} lap at time {time}")
         # Calculate ax to track speed
