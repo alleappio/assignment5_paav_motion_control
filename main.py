@@ -5,7 +5,7 @@ from simulation import Simulation
 import pid
 import purepursuit
 import stanley
-from mpc import *
+import mpc
 import cubic_spline_planner
 import math
 from parameters import SimulationParameters as sim_params
@@ -13,13 +13,15 @@ from parameters import VehicleParameters as vehicle_params
 from parameters import PIDParameters as PID_params
 from parameters import PurepursuitParameters as PP_params
 from parameters import StanleyParameters as stanley_params
+from parameters import MpcParameters as MPC_params
 
 # Create instance of PID for Longitudinal Control
 long_control_pid = pid.PIDController(kp=PID_params.kp, ki=PID_params.ki, kd=PID_params.kd, output_limits=PID_params.output_limits)
 
 # Create instance of PurePursuit, Stanley and MPC for Lateral Control
 pp_controller = purepursuit.PurePursuitController(vehicle_params.wheelbase, vehicle_params.max_steer)
-stanley_controller = stanley.StanleyController(stanley_params.k_stanley, vehicle_params.lf, max_steer, stanley_params.k_he, stanley_params.k_ctc)
+stanley_controller = stanley.StanleyController(stanley_params.k_stanley, vehicle_params.lf, vehicle_params.max_steer, stanley_params.k_he, stanley_params.k_ctc)
+mpc_controller = mpc.MPC(MPC_params.T, MPC_params.dt, MPC_params.N, vehicle_params.max_steer, vehicle_params.min_steer)
 
 def load_path(file_path):
     file = open(file_path, "r")
@@ -103,6 +105,7 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
     lat_error_vals, vel_error_vals = [], []
     
     # casadi_model() #for MPC... TO-DO
+    mpc_controller.casadi_model()
     prev_time=0
     for step in range(steps):
         time = step*dt
@@ -171,18 +174,18 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
             steer = stanley_controller.compute_steering_angle(actual_pose, stanley_target, sim.vx)
 
         ###### MPC
+        if(sim_params.controller == 'mpc'):
+            # get future horizon targets pose
+            targets = [ ]
+            s_pos = path_spline.cur_s
+            for i in range(mpc_controller.N):
+                step_increment = (sim.vx)*dt
+                trg = point_transform(path_spline.calc_position(s_pos), actual_pose, sim.theta)
+                trg = [ trg[0], trg[1] ]
+                targets.append(trg)
+                s_pos += step_increment
 
-        # get future horizon targets pose
-        # targets = [ ]
-        # s_pos = path_spline.cur_s
-        # for i in range(N):
-        #     step_increment = (sim.vx)*dt
-        #     trg = point_transform(path_spline.calc_position(s_pos), actual_pose, sim.theta)
-        #     trg = [ trg[0], trg[1] ]
-        #     targets.append(trg)
-        #     s_pos += step_increment
-
-        # steer = opt_step(targets, sim)
+            steer = mpc_controller.opt_step(targets, sim)
 
         prev_position = cur_position
         # Make one step simulation via model integration
@@ -203,7 +206,8 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         alpha_f_vals.append(alpha_f)
         alpha_r_vals.append(alpha_r)
 
-        vel_error = (abs(sim.vx-sim_params.target_speed)/sim_params.target_speed)*100
+        #vel_error = (abs(sim.vx-sim_params.target_speed)/sim_params.target_speed)*100
+        vel_error = long_control_pid.previous_error
         prj = [ position_projected[0], position_projected[1] ]
         local_error = point_transform(prj, actual_position, sim.theta)
         lat_error = math.sin(abs(local_error[1]))

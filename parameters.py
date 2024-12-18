@@ -4,8 +4,8 @@ class SimulationParameters:
     steer = 0.0                 # Constant steering angle (rad)
     sim_time = 60.0             # Simulation duration in seconds
     steps = int(sim_time / dt)  # Simulation steps (30 seconds)
-    target_speed = 25.0
-    controller = 'stanley'
+    target_speed = 20.0
+    controller = 'mpc'
 
 
 class VehicleParameters:
@@ -15,6 +15,7 @@ class VehicleParameters:
     mass = 1200                 # Vehicle mass (kg)
     Iz = 1792                   # Yaw moment of inertia (kg*m^2)
     max_steer = 3.14            # Maximum steering angle in radians
+    min_steer = -3.14            # Maximum steering angle in radians
 
 
 class PIDParameters:
@@ -35,3 +36,9 @@ class StanleyParameters:
     k_stanley = 1.5           # Gain for cross-track error for Stanley
     k_he = 1.5                # Gain for heading error
     k_ctc = 1.5               # Gain for cross-trac correction 
+
+
+class MpcParameters:
+    T =  1.0 # Horizon length in seconds
+    dt = 0.1 # Horizon timesteps
+    N = int(T/dt) # Horizon total points
