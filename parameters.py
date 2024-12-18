@@ -2,10 +2,10 @@ class SimulationParameters:
     dt = 0.001                  # Time step (s)
     ax = 0.0                    # Constant longitudinal acceleration (m/s^2)
     steer = 0.0                 # Constant steering angle (rad)
-    sim_time = 89.0             # Simulation duration in seconds
+    sim_time = 90.0             # Simulation duration in seconds
     steps = int(sim_time / dt)  # Simulation steps (30 seconds)
-    target_speed = 28.0
-    controller = 'stanley'
+    target_speed = 10.0
+    controller = 'purepursuit'
 
 
 class VehicleParameters:
@@ -19,15 +19,18 @@ class VehicleParameters:
 
 
 class PIDParameters:
-    kp = 1.7                      # Proportional gain
-    ki = 0.7                    # Integrative gain
-    kd = 0.1                    # Derivative gain
+    #kp = 1.7                      # Proportional gain
+    #ki = 0.7                    # Integrative gain
+    #kd = 0.1                    # Derivative gain
+    kp = 0.4                      # Proportional gain
+    ki = 0.05                    # Integrative gain
+    kd = 0.05                    # Derivative gain
     output_limits = (-2, 2)     # Saturation limits
 
 
 class PurepursuitParameters:
-    k_v = 0.15                     # Speed proportional gain for Pure Pursuit
-    k_c = 0.08                   # Curve proportional gain for Pure Pursuit
+    k_v = 0.3                     # Speed proportional gain for Pure Pursuit
+    k_c = 0.1                   # Curve proportional gain for Pure Pursuit
     limit_curvature = 0.01           # Minimum heading angle for adding curve proportional gain
     look_ahead = 1.0            # Minimum look-ahead distance for Pure Pursuit
 

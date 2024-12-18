@@ -100,9 +100,10 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
     sim = Simulation(vehicle_params.lf, vehicle_params.lr, vehicle_params.mass, vehicle_params.Iz, dt, integrator=integrator, model=model)
 
     # Storage for state variables and slip angles
-    x_vals, y_vals, theta_vals, vx_vals, vy_vals, r_vals = [], [], [], [], [], []
-    alpha_f_vals, alpha_r_vals = [], []  # Slip angles
+    x_vals, y_vals, theta_vals, steer_angle_vals, vx_vals, vy_vals, r_vals, ax_vals = [], [], [], [], [], [], [], []
+    alpha_f_vals, alpha_r_vals, beta_vals = [], [], []  # Slip angles
     lat_error_vals, vel_error_vals = [], []
+    Fyf_vals, Fyr_vals = [], []
     
     # casadi_model() #for MPC... TO-DO
     mpc_controller.casadi_model()
@@ -195,9 +196,11 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         x_vals.append(sim.x)
         y_vals.append(sim.y)
         theta_vals.append(sim.theta)
+        steer_angle_vals.append(steer)
         vx_vals.append(sim.vx)
         vy_vals.append(sim.vy)
         r_vals.append(sim.r)
+        ax_vals.append(ax)
 
         # Calculate slip angles for front and rear tires
         alpha_f = steer - np.arctan((sim.vy + sim.l_f * sim.r) / max(0.5, sim.vx))  # Front tire slip angle
@@ -205,16 +208,43 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         
         alpha_f_vals.append(alpha_f)
         alpha_r_vals.append(alpha_r)
+            
+        # Calculate side slip angle
+        beta = np.arctan(sim.vy/sim.vx)
+        beta_vals.append(beta)
 
         #vel_error = (abs(sim.vx-sim_params.target_speed)/sim_params.target_speed)*100
         vel_error = long_control_pid.previous_error
         prj = [ position_projected[0], position_projected[1] ]
         local_error = point_transform(prj, actual_position, sim.theta)
-        lat_error = math.sin(abs(local_error[1]))
+        lat_error = local_error[1]
 
         vel_error_vals.append(vel_error)
         lat_error_vals.append(lat_error)
-    return x_vals, y_vals, theta_vals, vx_vals, vy_vals, r_vals, alpha_f_vals, alpha_r_vals, vel_error_vals, lat_error_vals
+
+        # Lateral tire forces
+        Fyf, Fyr = 0, 0
+        if model == "linear":
+            # Vertical forces (nominal vertical load)
+            Fz_f_nominal = (sim.l_r/sim.l_wb)*sim.mass*9.81
+            Fz_r_nominal = (sim.l_f/sim.l_wb)*sim.mass*9.81
+
+            # Front and rear lateral forces
+            Fyf = Fz_f_nominal * sim.Cf * alpha_f
+            Fyr = Fz_r_nominal * sim.Cr * alpha_r
+
+        if model == "nonlinear":
+            # Vertical forces (nominal vertical load)
+            Fz_f_nominal = (sim.l_r/sim.l_wb)*sim.mass*9.81
+            Fz_r_nominal = (sim.l_f/sim.l_wb)*sim.mass*9.81
+
+            # Front and rear lateral forces
+            Fyf = Fz_f_nominal * sim.D * np.sin(sim.C*np.arctan(sim.B*alpha_f - sim.E*(sim.B * alpha_f - np.arctan(sim.B*alpha_f))))
+            Fyr = Fz_r_nominal * sim.D * np.sin(sim.C*np.arctan(sim.B*alpha_r - sim.E*(sim.B * alpha_r - np.arctan(sim.B*alpha_r))))
+
+        Fyf_vals.append(Fyf)
+        Fyr_vals.append(Fyr)
+    return x_vals, y_vals, theta_vals, steer_angle_vals, vx_vals, vy_vals, r_vals, ax_vals, alpha_f_vals, alpha_r_vals, beta_vals, vel_error_vals, lat_error_vals, Fyf_vals, Fyr_vals
 
 def main():
 
@@ -236,24 +266,34 @@ def main():
     x_results = [result[0] for result in all_results]
     y_results = [result[1] for result in all_results]
     theta_results = [result[2] for result in all_results]
-    vx_results = [result[3] for result in all_results]
-    vy_results = [result[4] for result in all_results]
-    r_results = [result[5] for result in all_results]
-    alpha_f_results = [result[6] for result in all_results]
-    alpha_r_results = [result[7] for result in all_results]
-    vel_error_results = [result[8] for result in all_results]
-    lat_error_results = [result[9] for result in all_results]
+    steer_results = [result[3] for result in all_results]
+    vx_results = [result[4] for result in all_results]
+    vy_results = [result[5] for result in all_results]
+    r_results = [result[6] for result in all_results]
+    ax_results = [result[7] for result in all_results]
+    alpha_f_results = [result[8] for result in all_results]
+    alpha_r_results = [result[9] for result in all_results]
+    beta_results = [result[10] for result in all_results]
+    vel_error_results = [result[11] for result in all_results]
+    lat_error_results = [result[12] for result in all_results]
+    Fyf_results = [result[13] for result in all_results]
+    Fyr_results = [result[14] for result in all_results]
 
     # Plot comparisons for each state variable
     plot_trajectory(x_results, y_results, labels, path_spline)
     #plot_comparison(theta_results, labels, "Heading Angle Comparison", "Time Step", "Heading Angle (rad)")
-    plot_comparison(vx_results, labels, "Longitudinal Velocity Comparison", "Time Step", "Velocity (m/s)")
+    #plot_comparison(steer_results, labels, "Steering Angle Comparison", "Time Step", "Steering Angle (rad)")
+    #plot_comparison(vx_results, labels, "Longitudinal Velocity Comparison", "Time Step", "Velocity (m/s)")
     #plot_comparison(vy_results, labels, "Lateral Velocity Comparison", "Time Step", "Lateral Velocity (m/s)")
     #plot_comparison(r_results, labels, "Yaw Rate Comparison", "Time Step", "Yaw Rate (rad/s)")
+    #plot_comparison(ax_results, labels, "Longiudinal Acceleration Comparison", "Time Step", "Acceleration (m/s^2)")
     #plot_comparison(alpha_f_results, labels, "Front Slip Angle Comparison", "Time Step", "Slip Angle (rad) - Front")
     #plot_comparison(alpha_r_results, labels, "Rear Slip Angle Comparison", "Time Step", "Slip Angle (rad) - Rear")
-    plot_comparison(vel_error_results, labels, "velocity error comparison", "Time Step", "Velocity Error (%)")
+    #plot_comparison(beta_results, labels, "Side Slip Angle Comparison", "Time Step", "Slip Angle (rad) - Side")
+    #plot_comparison(vel_error_results, labels, "velocity error comparison", "Time Step", "Velocity Error (%)")
     plot_comparison(lat_error_results, labels, "lateral error comparison", "Time Step", "Lateral Error (m)")
+    #plot_comparison(Fyf_results, labels, "Front Lateral Force", "Time Step", "Lateral Force - front (N)")
+    #plot_comparison(Fyr_results, labels, "Rear Lateral Force", "Time Step", "Lateral Force - rear (N)")
 
 if __name__ == "__main__":
     main()
