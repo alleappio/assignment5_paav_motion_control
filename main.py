@@ -21,7 +21,7 @@ long_control_pid = pid.PIDController(kp=PID_params.kp, ki=PID_params.ki, kd=PID_
 # Create instance of PurePursuit, Stanley and MPC for Lateral Control
 pp_controller = purepursuit.PurePursuitController(vehicle_params.wheelbase, vehicle_params.max_steer)
 stanley_controller = stanley.StanleyController(stanley_params.k_stanley, vehicle_params.lf, vehicle_params.max_steer, stanley_params.k_he, stanley_params.k_ctc)
-mpc_controller = mpc.MPC(MPC_params.T, MPC_params.dt, MPC_params.N, vehicle_params.max_steer, vehicle_params.min_steer)
+mpc_controller = mpc.MPC(MPC_params.T, MPC_params.dt, MPC_params.N, vehicle_params.max_steer, vehicle_params.min_steer, MPC_params.gain_mult)
 
 def load_path(file_path):
     file = open(file_path, "r")
@@ -185,11 +185,14 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
         if(sim_params.controller == 'mpc'):
             # get future horizon targets pose
             targets = [ ]
+
             s_pos = path_spline.cur_s
             for i in range(mpc_controller.N):
                 step_increment = (sim.vx)*dt
                 trg = point_transform(path_spline.calc_position(s_pos), actual_pose, sim.theta)
-                trg = [ trg[0], trg[1] ]
+                #print(trg)
+                #heading_angle = math.atan2(trg[1], trg[0]) 
+                trg = [ trg[0], trg[1], 0 ]
                 targets.append(trg)
                 s_pos += step_increment
 
