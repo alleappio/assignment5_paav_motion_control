@@ -7,30 +7,33 @@ class SimulationParameters:
     target_speed = 28.0
     controller = 'purepursuit'
     figures_path = 'figures/general'
+    vehicle_model = [
+        ("rk4", "nonlinear"),
+    ]
 
 
 class VehicleParameters:
-    lf = 1.156                  # Distance from COG to front axle (m)
-    lr = 1.42                   # Distance from COG to rear axle (m)
-    wheelbase = lf + lr         # Wheelbase of vehicle
-    mass = 1200                 # Vehicle mass (kg)
-    Iz = 1792                   # Yaw moment of inertia (kg*m^2)
-    max_steer = 3.14            # Maximum steering angle in radians
-    min_steer = -3.14            # Maximum steering angle in radians
+    lf = 1.156                # Distance from COG to front axle (m)
+    lr = 1.42                 # Distance from COG to rear axle (m)
+    wheelbase = lf + lr       # Wheelbase of vehicle
+    mass = 1200               # Vehicle mass (kg)
+    Iz = 1792                 # Yaw moment of inertia (kg*m^2)
+    max_steer = 3.14          # Maximum steering angle in radians
+    min_steer = -3.14         # Maximum steering angle in radians
 
 
 class PIDParameters:
-    kp = 1.7                      # Proportional gain
-    ki = 0.7                    # Integrative gain
-    kd = 0.1                    # Derivative gain
-    output_limits = (-2, 2)     # Saturation limits
+    kp = 1.7                  # Proportional gain
+    ki = 0.7                  # Integrative gain
+    kd = 0.1                  # Derivative gain
+    output_limits = (-2, 2)   # Saturation limits
 
 
 class PurepursuitParameters:
-    k_v = 0.15                     # Speed proportional gain for Pure Pursuit
-    k_c = 0.08                   # Curve proportional gain for Pure Pursuit
-    limit_curvature = 0.01           # Minimum heading angle for adding curve proportional gain
-    look_ahead = 1.0            # Minimum look-ahead distance for Pure Pursuit
+    k_v = 0.13                # Speed proportional gain for Pure Pursuit
+    k_c = 0.05                # Curve proportional gain for Pure Pursuit
+    limit_curvature = 0.01    # Minimum heading angle for adding curve proportional gain
+    look_ahead = 1.0          # Minimum look-ahead distance for Pure Pursuit
 
 
 class StanleyParameters:
@@ -40,6 +43,6 @@ class StanleyParameters:
 
 
 class MpcParameters:
-    T =  1.0 # Horizon length in seconds
-    dt = 0.1 # Horizon timesteps
-    N = int(T/dt) # Horizon total points
+    T =  1                    # Horizon length in seconds
+    dt = 0.05                 # Horizon timesteps
+    N = int(T/dt)             # Horizon total points
