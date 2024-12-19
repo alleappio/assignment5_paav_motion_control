@@ -190,9 +190,7 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
             for i in range(mpc_controller.N):
                 step_increment = (sim.vx)*dt
                 trg = point_transform(path_spline.calc_position(s_pos), actual_pose, sim.theta)
-                #print(trg)
-                #heading_angle = math.atan2(trg[1], trg[0]) 
-                trg = [ trg[0], trg[1], 0 ]
+                trg = [ trg[0], trg[1], path_spline.calc_yaw(s_pos) ]
                 targets.append(trg)
                 s_pos += step_increment
 
