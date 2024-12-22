@@ -4,11 +4,11 @@ class SimulationParameters:
     steer = 0.0                 # Constant steering angle (rad)
     sim_time = 90.0             # Simulation duration in seconds
     steps = int(sim_time / dt)  # Simulation steps (30 seconds)
-    target_speed = 29.0
-    controller = 'purepursuit'
-    figures_path = 'figures/exercise3/case2/purepursuit'
+    target_speed = 20.0
+    controller = 'mpc'
+    figures_path = 'figures/general'
     vehicle_model = [
-        ("rk4", "nonlinear"),
+        ("rk4", "kinematic"),
     ]
 
 
@@ -44,6 +44,9 @@ class StanleyParameters:
 
 class MpcParameters:
     gain_mult = 1.0
-    T =  1.0                    # Horizon length in seconds
-    dt = 0.05        # Horizon timesteps
+    k_x = 100.0
+    k_y = 100.0
+    k_theta = 10.0
+    T =  1.5                    # Horizon length in seconds
+    dt = 0.15        # Horizon timesteps
     N = int(T/dt)             # Horizon total points

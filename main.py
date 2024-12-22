@@ -21,7 +21,7 @@ long_control_pid = pid.PIDController(kp=PID_params.kp, ki=PID_params.ki, kd=PID_
 # Create instance of PurePursuit, Stanley and MPC for Lateral Control
 pp_controller = purepursuit.PurePursuitController(vehicle_params.wheelbase, vehicle_params.max_steer)
 stanley_controller = stanley.StanleyController(stanley_params.k_stanley, vehicle_params.lf, vehicle_params.max_steer, stanley_params.k_he, stanley_params.k_ctc)
-mpc_controller = mpc.MPC(MPC_params.T, MPC_params.dt, MPC_params.N, vehicle_params.max_steer, vehicle_params.min_steer, MPC_params.gain_mult)
+mpc_controller = mpc.MPC(MPC_params.T, MPC_params.dt, MPC_params.N, vehicle_params.max_steer, vehicle_params.min_steer, MPC_params.gain_mult, MPC_params.k_x,MPC_params.k_y,MPC_params.k_theta,)
 
 def load_path(file_path):
     file = open(file_path, "r")
