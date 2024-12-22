@@ -2,11 +2,11 @@ class SimulationParameters:
     dt = 0.001                  # Time step (s)
     ax = 0.0                    # Constant longitudinal acceleration (m/s^2)
     steer = 0.0                 # Constant steering angle (rad)
-    sim_time = 180.0             # Simulation duration in seconds
+    sim_time = 90.0             # Simulation duration in seconds
     steps = int(sim_time / dt)  # Simulation steps (30 seconds)
-    target_speed = 10.0
-    controller = 'stanley'
-    figures_path = 'figures/exercise2/case1/stanley'
+    target_speed = 29.0
+    controller = 'purepursuit'
+    figures_path = 'figures/exercise3/case2/purepursuit'
     vehicle_model = [
         ("rk4", "nonlinear"),
     ]
@@ -32,7 +32,7 @@ class PIDParameters:
 class PurepursuitParameters:
     k_v = 0.13                # Speed proportional gain for Pure Pursuit
     k_c = 0.05                # Curve proportional gain for Pure Pursuit
-    limit_curvature = 0.01    # Minimum heading angle for adding curve proportional gain
+    limit_curvature = 0.05    # Minimum heading angle for adding curve proportional gain
     look_ahead = 1.0          # Minimum look-ahead distance for Pure Pursuit
 
 
@@ -43,7 +43,7 @@ class StanleyParameters:
 
 
 class MpcParameters:
-    gain_mult = 1
-    T =  1.5                    # Horizon length in seconds
-    dt = 0.1                 # Horizon timesteps
+    gain_mult = 1.0
+    T =  1.0                    # Horizon length in seconds
+    dt = 0.05        # Horizon timesteps
     N = int(T/dt)             # Horizon total points
