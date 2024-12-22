@@ -22,10 +22,10 @@ class Simulation:
         self.C_rr = 0.015              # Rolling resistance coefficient
 
         # Initialize states
-        self.x = 0                      # X position (m)
+        self.x = 0                     # X position (m)
         self.y = 0                      # Y position (m)
         self.theta = 0                  # Heading angle (rad)
-        self.vx = 0.001                     # Longitudinal velocity (m/s)
+        self.vx = 0.001                    # Longitudinal velocity (m/s)
         self.vy = 0                     # Lateral velocity (m/s)
         self.r = 0                      # Yaw rate (rad/s)
         self.beta = 0
