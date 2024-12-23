@@ -2,10 +2,10 @@ class SimulationParameters:
     dt = 0.001                          # Time step (s)
     ax = 0.0                            # Constant longitudinal acceleration (m/s^2)
     steer = 0.0                         # Constant steering angle (rad)
-    sim_time = 90.0                     # Simulation duration in seconds
+    sim_time = 80.0                     # Simulation duration in seconds
     steps = int(sim_time / dt)          # Simulation steps (30 seconds)
-    target_speed = 29.0                 # Target speed to reach
-    controller = 'purepursuit'          # Controller used
+    target_speed = 32.0                 # Target speed to reach
+    controller = 'mpc'          # Controller used
     figures_path = 'figures/general'    # Path for graph saving
     vehicle_model = [
         ("rk4", "kinematic"),
