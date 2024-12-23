@@ -1,12 +1,12 @@
 class SimulationParameters:
-    dt = 0.001                  # Time step (s)
-    ax = 0.0                    # Constant longitudinal acceleration (m/s^2)
-    steer = 0.0                 # Constant steering angle (rad)
-    sim_time = 65.0             # Simulation duration in seconds
-    steps = int(sim_time / dt)  # Simulation steps (30 seconds)
-    target_speed = 20.0
-    controller = 'mpc'
-    figures_path = 'figures/general'
+    dt = 0.001                          # Time step (s)
+    ax = 0.0                            # Constant longitudinal acceleration (m/s^2)
+    steer = 0.0                         # Constant steering angle (rad)
+    sim_time = 90.0                     # Simulation duration in seconds
+    steps = int(sim_time / dt)          # Simulation steps (30 seconds)
+    target_speed = 29.0                 # Target speed to reach
+    controller = 'purepursuit'          # Controller used
+    figures_path = 'figures/general'    # Path for graph saving
     vehicle_model = [
         ("rk4", "kinematic"),
     ]
@@ -47,7 +47,7 @@ class MpcParameters:
     k_x = 100.0
     k_y = 100.0
     k_theta = 10.0
-    k_j = 10000.0
+    k_j = 100000.0              
     T =  1.5                    # Horizon length in seconds
-    dt = 0.15        # Horizon timesteps
-    N = int(T/dt)             # Horizon total points
+    dt = 0.15                   # Horizon timesteps
+    N = int(T/dt)               # Horizon total points
