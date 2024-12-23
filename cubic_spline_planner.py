@@ -134,6 +134,7 @@ class Spline2D:
 
     def __init__(self, x, y):
         self.s = self.__calc_s(x, y)
+        #print(x)
         self.sx = Spline(self.s, x)
         self.sy = Spline(self.s, y)
         self.cur_s = 0
@@ -183,8 +184,9 @@ class Spline2D:
         u"""
         calc yaw
         """
-        dx = self.sx.calcd(s)
-        dy = self.sy.calcd(s)
+        epsilon = 1.0e-6
+        dx = self.sx.calcd(s) or epsilon
+        dy = self.sy.calcd(s) or epsilon
         yaw = math.atan2(dy, dx)
         return yaw
 
