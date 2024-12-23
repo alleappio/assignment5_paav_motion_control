@@ -191,7 +191,6 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
             steer = stanley_controller.compute_steering_angle(actual_pose, stanley_target, sim.vx)
 
         ###### MPC
-        prev_yaw = 0
         if(sim_params.controller == 'mpc'):
             # get future horizon targets pose
             targets = [ ]
