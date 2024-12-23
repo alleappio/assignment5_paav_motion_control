@@ -191,6 +191,7 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
             steer = stanley_controller.compute_steering_angle(actual_pose, stanley_target, sim.vx)
 
         ###### MPC
+        prev_yaw = 0
         if(sim_params.controller == 'mpc'):
             # get future horizon targets pose
             targets = [ ]
@@ -199,7 +200,8 @@ def run_simulation(ax, steer, dt, integrator, model, steps=500):
             for i in range(mpc_controller.N):
                 step_increment = (sim.vx)*dt
                 trg = path_spline.calc_position(s_pos)
-                trg = [ trg[0], trg[1], path_spline.calc_yaw(s_pos) ]
+                yaw = path_spline.calc_yaw(s_pos)
+                trg = [ trg[0], trg[1], yaw]
                 targets.append(trg)
                 s_pos += step_increment
 
